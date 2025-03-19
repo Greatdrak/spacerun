@@ -6,7 +6,7 @@ import * as THREE from "three";
 const MovingStars = ({ hyperdrive }) => {
   const starsRef = useRef();
   const stars = useRef(
-    new Array(5000).fill().map(() => [
+    new Array(1000).fill().map(() => [
       (Math.random() - 0.5) * 2000,
       (Math.random() - 0.5) * 2000,
       Math.random() * -1000,

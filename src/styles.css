@@ -7,10 +7,45 @@
   left: 0;
   background-color: black;
   display: block;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
   cursor: crosshair;
+  z-index: 1;
+}
+
+/* Scene container for 3D elements */
+.scene-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Cockpit scene wrapper */
+.cockpit-scene {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* UI container for overlay elements */
+.ui-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.ui-container > * {
+  pointer-events: auto;
 }
 
 /* Make sure Canvas takes up full screen */
@@ -18,10 +53,15 @@
   width: 100vw !important;
   height: 100vh !important;
   display: block;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
 }
+
 .dashboard {
-  position: absolute;
+  position: fixed;
   bottom: 0;
+  left: 0;
   width: 100%;
   height: 20%;
   background: rgba(0, 0, 0, 0.8);
@@ -33,17 +73,32 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 10;
+  z-index: 1003;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.dashboard.hyperdrive-active {
+  border-color: #00ffff;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.dashboard.engaging {
+  animation: pulse 0.5s infinite;
 }
 
 .dashboard-screen {
   font-size: 24px;
   font-weight: bold;
   text-transform: uppercase;
-  transition: color 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
 }
-.dashboard-screen:has(.active) {
-  color: red;
+
+.dashboard-screen.active {
+  color: #00ffff;
+  text-shadow: 0 0 10px #00ffff;
 }
 
 .dashboard-controls {
@@ -58,19 +113,45 @@
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: all 0.3s ease;
 }
 
-.control-button:hover {
+.control-button:hover:not(:disabled) {
   background: limegreen;
   color: black;
 }
+
 .control-button.active {
-  background: red;
-  color: white;
-  border-color: red;
-  box-shadow: 0px 0px 15px red;
+  background: #00ffff;
+  color: black;
+  border-color: #00ffff;
+  box-shadow: 0 0 15px #00ffff;
 }
+
+.control-button.engaging {
+  animation: pulse 0.5s infinite;
+  background: #00ffff;
+  color: black;
+  border-color: #00ffff;
+}
+
+.control-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 5px #00ffff;
+  }
+  50% {
+    box-shadow: 0 0 20px #00ffff;
+  }
+  100% {
+    box-shadow: 0 0 5px #00ffff;
+  }
+}
+
 .space-cat {
   position: absolute;
   width: 200px; /* Adjust as needed */
@@ -84,7 +165,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  z-index: 100; /* Ensure it's above the canvas */
+  z-index: 1001;
+  pointer-events: auto;
 }
 .cat-image {
   width: 200px; /* Resize cat */
@@ -111,11 +193,334 @@
   margin-top: 10px;
   border-radius: 5px;
   transition: background 0.3s ease;
+  position: relative;
+  z-index: 1002;
+  pointer-events: auto;
 }
 
 .accept-mission-button:hover {
   background: darkgreen;
   color: white;
+}
+
+.scrolling-text-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 5; /* Lower z-index to be behind HUD */
+  pointer-events: none; /* Allow clicking through */
+  background: transparent; /* Remove the overlay */
+}
+
+.scrolling-text {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  color: rgba(255, 215, 0, 0.7); /* More transparent gold */
+  font-family: 'Arial', sans-serif;
+  perspective: 400px;
+}
+
+.text-content {
+  transform-style: preserve-3d;
+  text-align: center;
+  padding: 2rem;
+}
+
+.text-content h1 {
+  font-size: 3rem; /* Slightly smaller */
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); /* More subtle glow */
+}
+
+.text-content p {
+  font-size: 1.2rem; /* Slightly smaller */
+  margin: 1rem 0;
+  line-height: 1.5;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.3); /* More subtle glow */
+}
+
+/* Star field styles */
+.starfield {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: starMove 5s linear infinite;
+}
+
+.starfield.hyperdrive-active .star {
+  background: #00ffff;
+  box-shadow: 0 0 10px #00ffff;
+  animation: hyperdriveMove 2s linear infinite;
+}
+
+@keyframes starMove {
+  0% {
+    transform: translateZ(0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateZ(1000px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes hyperdriveMove {
+  0% {
+    transform: translateZ(0) scale(1);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateZ(2000px) scale(0);
+    opacity: 0;
+  }
+}
+
+/* Status Display Styles */
+.status-display {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1005;
+  pointer-events: auto;
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px;
+  border: 1px solid #00ff00;
+  border-radius: 5px;
+  min-width: 200px;
+}
+
+.status-label {
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  text-shadow: 0 0 5px #00ff00;
+}
+
+.status-bar {
+  width: 100%;
+  height: 10px;
+  background: rgba(0, 255, 0, 0.2);
+  border: 1px solid #00ff00;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.status-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.health-fill {
+  background: #ff0000;
+  box-shadow: 0 0 10px #ff0000;
+}
+
+.shield-fill {
+  background: #00ffff;
+  box-shadow: 0 0 10px #00ffff;
+}
+
+.status-value {
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  text-align: right;
+  text-shadow: 0 0 5px #00ff00;
+}
+
+/* Controls Styles */
+.controls {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1004;
+  display: flex;
+  gap: 20px;
+  pointer-events: auto;
+}
+
+.hyperdrive-button,
+.shield-button {
+  background: black;
+  color: limegreen;
+  border: 2px solid limegreen;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+}
+
+.hyperdrive-button:hover:not(:disabled),
+.shield-button:hover:not(:disabled) {
+  background: rgba(0, 255, 0, 0.2);
+  box-shadow: 0 0 15px #00ff00;
+}
+
+.hyperdrive-button.active,
+.shield-button.active {
+  background: rgba(0, 255, 0, 0.3);
+  box-shadow: 0 0 20px #00ff00;
+}
+
+.hyperdrive-button.engaging,
+.shield-button.engaging {
+  animation: pulse 1s infinite;
+}
+
+.hyperdrive-button:disabled,
+.shield-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.shield-button {
+  border-color: #00ffff;
+  color: #00ffff;
+  text-shadow: 0 0 5px #00ffff;
+}
+
+.shield-button:hover:not(:disabled) {
+  background: rgba(0, 255, 255, 0.2);
+  box-shadow: 0 0 15px #00ffff;
+}
+
+.shield-button.active {
+  background: rgba(0, 255, 255, 0.3);
+  box-shadow: 0 0 20px #00ffff;
+}
+
+/* Keyboard Key Style */
+.keyboard-key {
+  display: inline-block;
+  background: linear-gradient(145deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6));
+  border: 1px solid #00ff00;
+  border-radius: 4px;
+  padding: 3px 8px;
+  margin: 0 4px;
+  font-size: 14px;
+  color: #00ff00;
+  text-shadow: 0 0 5px #00ff00;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    0 0 8px rgba(0, 255, 0, 0.3);
+  transform: translateY(0);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.keyboard-key::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 4px;
+  background: linear-gradient(145deg, rgba(0, 255, 0, 0.1), transparent);
+  pointer-events: none;
+}
+
+.shield-button .keyboard-key {
+  border-color: #00ffff;
+  color: #00ffff;
+  text-shadow: 0 0 5px #00ffff;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    0 0 8px rgba(0, 255, 255, 0.3);
+}
+
+.shield-button .keyboard-key::before {
+  background: linear-gradient(145deg, rgba(0, 255, 255, 0.1), transparent);
+}
+
+/* Add hover effect to the buttons */
+.hyperdrive-button:hover .keyboard-key,
+.shield-button:hover .keyboard-key {
+  transform: translateY(-1px);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    0 0 12px rgba(0, 255, 0, 0.4);
+}
+
+.shield-button:hover .keyboard-key {
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    0 0 12px rgba(0, 255, 255, 0.4);
+}
+
+/* Laser Canvas */
+.laser-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+  z-index: 2;
+  background: transparent;
+}
+
+/* Mission Container */
+.mission-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.mission-container > * {
+  pointer-events: auto;
 }
 
 

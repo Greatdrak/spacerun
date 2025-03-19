@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-const SpaceCat = ({ onAcceptMission }) => {
+/**
+ * SpaceCat Component
+ * Provides mission instructions and reacts dynamically to mission progress.
+ */
+const SpaceCat = ({ missionActive, missionStatus, missionInstructions, onAcceptMission }) => {
   const [showCat, setShowCat] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowCat(true);
-    }, 1000); // Show cat after 10 seconds
+    }, 1000); // Show cat after 1 second
     return () => clearTimeout(timer);
   }, []);
 
@@ -20,8 +24,10 @@ const SpaceCat = ({ onAcceptMission }) => {
         transition={{ duration: 2 }}
       >
         <img src="/space-cat.png" alt="Space Cat" className="cat-image" />
-        <p className="cat-text">Welcome to space, Cadet! Are you ready for your first mission?</p>
-        <button className="accept-mission-button" onClick={onAcceptMission}>Accept Mission</button>
+        <p className="cat-text">{missionInstructions}</p>
+        {missionStatus === "not-started" && (
+          <button className="accept-mission-button" onClick={onAcceptMission}>Accept Mission</button>
+        )}
       </motion.div>
     )
   );

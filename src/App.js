@@ -1,12 +1,16 @@
 import React from "react";
+import { Provider } from 'react-redux';
+import store from './store/store';
 import Cockpit from "./components/Cockpit"; // Ensure this matches your folder structure
 import "./styles.css";
 
 function App() {
   return (
-    <div className="App">
-      <Cockpit />
-    </div>
+    <Provider store={store}>
+      <div className="App">
+        <Cockpit />
+      </div>
+    </Provider>
   );
 }
 
