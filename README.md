@@ -1,10 +1,8 @@
 # Space Run 🚀
 
-A fun space adventure game built with React and Three.js. Navigate through space, battle enemies, and collect credits in this interactive web-based game.
+A fun space adventure game built with React and Three.js. Navigate through space, battle enemies, and collect credits in this interactive web-based game. Rooted in retro web-based games experience from the early 2000s.
 
 ## 🎮 Features
-
-- 3D space environment with dynamic star field
 - Dual laser cannons with particle effects
 - Shield and hyperdrive systems
 - Mission-based gameplay
